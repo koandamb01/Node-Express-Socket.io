@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Socket Real Time Color</title>
+    <style>
+        .container {
+            width: 90%;
+            margin: auto;
+            padding-top: 38vh;
+            text-align: center;
+        }
+
+        .container button {
+            padding: 50px;
+            margin: 18px;
+            width: 250px;
+            border-radius: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body style="background-color: <%= color %>">
+    <div class="container">
+        <button class="red">Red</button>
+        <button class="yellow">Yellow</button>
+        <button class="green">Green</button>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function () {
+            // get my socket function
+            const socket = io();
+
+            $('button').click(function () {
+                var btnColor = $(this).text().toLowerCase();
+                socket.emit('change-color', { color: btnColor })
+            });
+
+            // get the server socket response
+            socket.on('change-color', function (data) {
+                $('body').css('background-color', data.color);
+            });
+        });
+    </script>
+</body>
+
+</html>
