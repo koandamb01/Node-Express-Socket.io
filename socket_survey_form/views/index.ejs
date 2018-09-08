@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <title>Socket Survey Form</title>
+    <style>
+        .container{
+            width: 40% !important;
+            margin-top: 5vh;
+        }
+
+        .display-result{
+            display: none;
+            margin: 25px auto;
+            color: aliceblue;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgb(105, 104, 104);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h3>Mock Survey With Socket.io</h3>
+        <div class="display-result bg-success"></div>
+        <form id="myForm" method="POST">
+            <div class="form-group">
+                <label for="">
+                    Your Name: <input type="text" class="form-control" name="name" placeholder="Full name">
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    Dojo Location:
+                    <select class="form-control" name="location">
+                        <option value="San Jose">San Jose</option>
+                        <option value="Seattle">Seattle</option>
+                        <option value="LA">LA</option>
+                        <option value="Dallas">Dallas</option>
+                        <option value="Chicago">Chicago</option>
+                        <option value="Tulsa">Tulsa</option>
+                        <option value="East Bay">East Bay</option>
+                    </select>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    Favorites Language
+                    <select class="form-control" name="language">
+                        <option value="PHP">PHP</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="Java">Java</option>
+                        <option value="Python">Python</option>
+                        <option value="Swift">Swift</option>
+                    </select>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>Comment (optional)</label>
+                <textarea name="comment" class="form-control" rows="3" cols="50"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function () {
+            var socket = io();
+            // submit form now
+            $('#myForm').submit(function (e) {
+                e.preventDefault(); // prevent the form from submitting
+
+                // convert form data to JSON
+                var data = $(this).serializeArray().map(function (input) {
+                    this[input.name] = input.value;
+                    return this;
+                }.bind({}))[0];
+
+                // send data using socket.io
+                socket.emit('posting_form', data);
+            });
+
+            // Listen for updated_message socket response
+            socket.on('updated_message', function (data) {
+                // display the data in html elem
+                $('.display-result').html(`
+                <p>You have emitted the below information the server</p>
+                <p>` + JSON.stringify(data) + `</p>
+                `).show();
+            });
+            // Listen for random_number socket response
+            socket.on('random_number', function (data) {
+                // display the data in html elem
+                $('.display-result').append(`
+                <p>Your lucky number emitted by the server is: <span class="text-warning">` + data.number + `</span></p>
+                `);
+            });
+        });
+    </script>
+</body>
+
+</html>
