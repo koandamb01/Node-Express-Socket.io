@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <title>Counter</title>
+    <style>
+        .display {
+            margin-top: 15vh;
+            text-align: center;
+        }
+
+        h1 {
+            padding: 50px;
+            margin: 50px auto;
+            width: 200px;
+            color: aliceblue;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="display">
+            <h1 class="bg-primary counter">
+                <%= counter %>
+            </h1>
+            <h5>The button has been push <span class="counter text-info">
+                    <%= counter %></span> times(s)</h5>
+            <br>
+            <p>Push the button to update the count!</p>
+            <button class="btn btn-success" id="btn-update">Epic Me</button>
+            <br>
+            <br>
+            <button class="btn btn-danger" id="btn-reset">Reset Count</button>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function () {
+            // create a socket.io
+            const socket = io();
+
+            // btn update click
+            $('#btn-update').click(function () {
+                // send socket emit request
+                socket.emit('update');
+            });
+
+            // btn reset click
+            $('#btn-reset').click(function () {
+                // send socket emit request
+                socket.emit('reset');
+            });
+
+            // socket on response
+            socket.on('update', function (data) {
+                console.log("new data", data);
+                $('.counter').text(data.counter);
+            });
+
+        });
+    </script>
+</body>
+
+</html>
