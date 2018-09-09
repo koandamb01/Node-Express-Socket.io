@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Socket Chat Room</title>
+</head>
+
+<body>
+    <div class="container">
+        <h5>Conversation Board</h5>
+        <div class="chat-container">
+            <ul class="list-group" id="chat-room"></ul>
+        </div>
+
+        <div class="message-box">
+            <form id="myForm">
+                <input type="text" class="form-control" id="message">
+                <button class="btn btn-primary">Send</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function () {
+            // prompt the user for their name
+            // keep on asking the user until the user enter a name
+            var userName;
+            do {
+                userName = prompt("Please enter your name");
+            }
+            while (userName == '' || userName == null);
+
+            const socket = io(); // get socket.io function
+            socket.emit('add_user'); // emit socket add user name
+
+            // socket response to chat room
+            socket.on('chat_room', function (data) {
+                // display chat
+                for (let chat of data.chats) {
+                    $('#chat-room').append(`
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="badge badge-primary badge-pill">`+ chat.userName + `: </span>` + chat.message + `
+                        </li>
+                    `);
+                }
+                // show container now
+                $('.container').show();
+
+                // Jquery auto scroll to the top
+                var h = $('#chat-room').parent().get(0).scrollHeight;
+                $('#chat-room').parent().animate({ scrollTop: h });
+            });
+
+            // socket response to chat room
+            socket.on('add_message', function (data) {
+                // display chat
+                for (let chat of data.chats) {
+                    $('#chat-room').append(`
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="badge badge-primary badge-pill">`+ chat.userName + `: </span>` + chat.message + `
+                        </li>
+                    `);
+                }
+                // Jquery auto scroll to the top
+                var h = $('#chat-room').parent().get(0).scrollHeight;
+                $('#chat-room').parent().animate({ scrollTop: h });
+            });
+
+            // socket emit mesage
+            $('#myForm').submit(function (e) {
+
+                e.preventDefault();
+
+                // get the message
+                var message = $('#message').val();
+                $('#message').val('');
+                // check if the input is empty
+                if (message == '') {
+                    $('#message').css('border', '1px solid red');
+                } else {
+                    $('#message').css('border', '1px solid grey');
+                    // now send a socket emit message
+                    socket.emit('send_message', { userName: userName, message: message });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
