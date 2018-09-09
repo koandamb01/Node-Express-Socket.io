@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Socket Notifications</title>
+    <style>
+        .container {
+            width: 70%;
+            margin: auto;
+            margin-top: 15vh;
+            text-align: center;
+        }
+
+        button {
+            padding: 40px;
+            color: aliceblue;
+            background-color: #448aff;
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+
+        span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <button>Notify Everyone!</button>
+
+        <div class="list-socket">
+            <!-- <p>Socket ID: <span>asdasd9-0asd0=23e01=\31212</span></p>
+            <p>Socket ID: <span>asdasd9-0asd0=23e01=\31212</span></p>
+            <p>Socket ID: <span>asdasd9-0asd0=23e01=\31212</span></p>
+            <p>Socket ID: <span>asdasd9-0asd0=23e01=\31212</span></p>
+            <p>Socket ID: <span>asdasd9-0asd0=23e01=\31212</span></p>
+            <p>Socket ID: <span>asdasd9-0asd0=23e01=\31212</span></p> -->
+        </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function () {
+            const socket = io();
+
+            socket.emit('connect_me');
+
+            // received a socket notification
+            socket.on('join-notifications', function (data) {
+                $('.list-socket').html('');
+                for (user of data.socketIDs) {
+                    $('.list-socket').append(`<p>Socket ID: <span>` + user.socketID + `</span> ` + user.notification + `</p>`);
+                }
+            });
+
+
+            $('button').click(function () {
+                // send a socket trigged notifications to everyone
+                socket.emit('notify-everyone');
+            });
+        });
+    </script>
+</body>
+
+</html>
